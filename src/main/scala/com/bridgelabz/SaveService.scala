@@ -1,62 +1,55 @@
 package com.bridgelabz
-
-import java.io.{BufferedWriter, FileWriter}
-
-import akka.Done
-import akka.actor.ActorSystem
-import au.com.bytecode.opencsv.CSVWriter
-import org.mongodb.scala.bson.BsonDocument
-import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
-import spray.json.{JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString, JsValue}
-
-import scala.collection.mutable.ListBuffer
-import scala.util.parsing.json._
-import scala.concurrent.{ExecutionContext, Future}
+import org.mongodb.scala.Document
+import spray.json.{JsNull, JsObject, JsValue}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
-object SaveService {
-  implicit val system = ActorSystem("HelloWorld")
-  implicit val executor: ExecutionContext = system.dispatcher
-  val mongoClient: MongoClient = MongoClient()
-  // Getting mongodb database
-  val databaseName = sys.env("database_name")
-  val database: MongoDatabase = mongoClient.getDatabase(databaseName)
-  // Getting mongodb collection
-  val collectionName = sys.env("collection_name")
-  val collection: MongoCollection[Document] = database.getCollection(collectionName)
-  collection.drop()
+object SaveService extends SaveBuilder {
 
-  def saveToDatabase(str:Seq[JsValue]) = {
-    val data = str.head
-    println(data match {
+  /**
+   *
+   * @param seqStr : values that we receive from our api for Time Series (5min) field
+   */
+  def saveToDatabase(seqStr:Seq[JsValue]) = {
+    val data = seqStr.head
+    data match {
       case JsObject(fields) =>
         fields.values.foreach(value => {
           val open = value.asJsObject().fields("1. open")
           val high = value.asJsObject().fields("2. high")
           val low = value.asJsObject().fields("3. low")
           val close = value.asJsObject().fields("4. close")
-          val vol = value.asJsObject().fields("5. volume")
-          val doc : Document = Document("Open" -> open.toString, "High" -> high.toString, "Low" -> low.toString, "Close" -> close.toString , "Volume" -> vol.toString)
-          val bindFuture = collection.insertOne(doc).toFuture()
+          val volume = value.asJsObject().fields("5. volume")
+          val documentToBeInserted : Document = Document("Open" -> open.toString, "High" -> high.toString, "Low" -> low.toString, "Close" -> close.toString , "Volume" -> volume.toString)
+          val bindFuture = MongoDBService.collection.insertOne(documentToBeInserted).toFuture()
           bindFuture.onComplete{
-            case Success(_) => println("")
-            case Failure(_) => println("")
+            case Success(_) => println("Added Successfully!")
+            case Failure(exception) => println(exception)
           }
         })
-      case JsNull => println("Null")
-    })
+      case JsNull => println("Null value found in data")
+    }
   }
+
+  /**
+   *
+   * @param str : values that we receive from our api for Time Series (5min) field
+   */
   def saveToCSV(str:Seq[JsValue]) = {
-  val outputFile = new BufferedWriter(new FileWriter("Result.csv"))
-  val csvWriter = new CSVWriter(outputFile)
-    val data = str.head
-    println(data match {
-      case JsObject(fields) =>
-        //var listOfRecords = new ListBuffer[Array[String]]()
-        //val csvFields = Array("Open","High","Low","Close","Volume")
-        fields.values.foreach(value => println(value.asJsObject().fields("1. open")))
-      case JsNull => println("Null")
-    })
+//  val outputFile = new BufferedWriter(new FileWriter("Result.csv"))
+//  val csvWriter = new CSVWriter(outputFile)
+//    val data = str.head
+//    println(data match {
+//      case JsObject(fields) => {
+//        var listOfRecords = new ListBuffer[Array[String]]()
+//        val csvFields = Array("Open","High","Low","Close","Volume")
+//        listOfRecords += csvFields
+//        fields.values.foreach(value => {
+//          listOfRecords += Array(value.asJsObject().fields("1. open"),value.asJsObject().fields("2. high"),value.asJsObject().fields("3. low"),value.asJsObject().fields("4. close"),value.asJsObject().fields("5. volume"))
+//          csvWriter.writeAll(listOfRecords.toList)
+//        })
+//      }
+//      case JsNull => println("Null")
+//    })
 }
 }
