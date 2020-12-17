@@ -1,26 +1,31 @@
 package com.bridgelabz
+import java.io.{BufferedWriter, FileWriter}
+import au.com.bytecode.opencsv.CSVWriter
 import org.mongodb.scala.Document
-import spray.json.{JsNull, JsObject, JsValue}
+import play.api.libs.json.{JsNull, JsObject, JsValue}
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
-
-object SaveService extends SaveBuilder {
+import scala.jdk.CollectionConverters._
+object SaveService {
 
   /**
    *
-   * @param seqStr : values that we receive from our api for Time Series (5min) field
+   * @param str : values that we receive from our api for Time Series (5min) field
+   *  Used to parse Json data, extract values in form of string and save data into MongoDB database
    */
-  def saveToDatabase(seqStr:Seq[JsValue]) = {
-    val data = seqStr.head
+  def saveToDatabase(str:(String,JsValue)) = {
+    val data = str._2
     data match {
       case JsObject(fields) =>
         fields.values.foreach(value => {
-          val open = value.asJsObject().fields("1. open")
-          val high = value.asJsObject().fields("2. high")
-          val low = value.asJsObject().fields("3. low")
-          val close = value.asJsObject().fields("4. close")
-          val volume = value.asJsObject().fields("5. volume")
-          val documentToBeInserted : Document = Document("Open" -> open.toString, "High" -> high.toString, "Low" -> low.toString, "Close" -> close.toString , "Volume" -> volume.toString)
+          val jsObject = value.as[JsObject]
+          val open = jsObject("1. open").toString()
+          val high = jsObject("2. high").toString()
+          val low = jsObject("3. low").toString()
+          val close = jsObject("4. close").toString()
+          val volume = jsObject("5. volume").toString()
+          val documentToBeInserted : Document = Document("Open" -> open, "High" -> high, "Low" -> low, "Close" -> close , "Volume" -> volume)
           val bindFuture = MongoDBService.collection.insertOne(documentToBeInserted).toFuture()
           bindFuture.onComplete{
             case Success(_) => println("Added Successfully!")
@@ -34,22 +39,26 @@ object SaveService extends SaveBuilder {
   /**
    *
    * @param str : values that we receive from our api for Time Series (5min) field
+   *  Used to parse Json data, extract values in form of string and save into Result.csv file using fields mentioned
    */
-  def saveToCSV(str:Seq[JsValue]) = {
-//  val outputFile = new BufferedWriter(new FileWriter("Result.csv"))
-//  val csvWriter = new CSVWriter(outputFile)
-//    val data = str.head
-//    println(data match {
-//      case JsObject(fields) => {
-//        var listOfRecords = new ListBuffer[Array[String]]()
-//        val csvFields = Array("Open","High","Low","Close","Volume")
-//        listOfRecords += csvFields
-//        fields.values.foreach(value => {
-//          listOfRecords += Array(value.asJsObject().fields("1. open"),value.asJsObject().fields("2. high"),value.asJsObject().fields("3. low"),value.asJsObject().fields("4. close"),value.asJsObject().fields("5. volume"))
-//          csvWriter.writeAll(listOfRecords.toList)
-//        })
-//      }
-//      case JsNull => println("Null")
-//    })
+  def saveToCSV(str:(String,JsValue)) = {
+    val outputFile = new BufferedWriter(new FileWriter("Result.csv"))
+    val csvWriter = new CSVWriter(outputFile)
+    val data = str._2
+    data match {
+      case JsObject(fields) => {
+        var listOfRecords = new ListBuffer[Array[String]]()
+        val csvFields = Array("Open","High","Low","Close","Volume")
+        listOfRecords += csvFields
+        fields.values.foreach(value => {
+          val jsObject = value.as[JsObject]
+          listOfRecords += Array(jsObject("1. open").toString, jsObject("2. high").toString, jsObject("3. low").toString, jsObject("4. close").toString, jsObject("5. volume").toString)
+        })
+        csvWriter.writeAll(listOfRecords.toList.asJava)
+        println("Written!")
+        outputFile.close()
+      }
+      case JsNull => println("Null")
+    }
 }
 }
