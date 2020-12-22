@@ -8,6 +8,7 @@ class DownloadActor extends Actor{
   val url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=5min&outputsize=full&apikey=demo"
   override def receive: Receive = {
     case _:String => log.info("Downloading data from " + url)
+                    sender() ! true
 
   }
 }
