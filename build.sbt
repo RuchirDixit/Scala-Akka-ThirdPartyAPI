@@ -16,12 +16,8 @@ libraryDependencies ++= Seq(
   "au.com.bytecode" % "opencsv" % "2.4",
   "io.spray" %% "spray-json" % "1.3.6",
   "org.scalatest" %% "scalatest-flatspec" % "3.2.2" % "test",
-  "com.typesafe.play" %% "play-json" % "2.8.0"
+  "com.typesafe.play" %% "play-json" % "2.8.0",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "org.scalatestplus" %% "mockito-3-4" % "3.2.3.0" % "test",
+  "org.scalatest" %% "scalatest" % "3.2.2" % Test,
 )
-//scalaVersion := "2.10.2"
-//libraryDependencies ++= Seq(
-//  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
-//  "org.json4s" %% "json4s-native" % "3.2.9",
-//  "org.json4s" %% "json4s-jackson" % "3.2.9",
-//  "com.typesafe.akka" %% "akka-actor" % "2.2.3"
-//)
