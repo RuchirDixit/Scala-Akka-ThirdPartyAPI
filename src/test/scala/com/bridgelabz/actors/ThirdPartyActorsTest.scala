@@ -21,14 +21,12 @@ import com.typesafe.scalalogging.LazyLogging
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-
 import scala.concurrent.ExecutionContextExecutor
 
 class ThirdPartyActorsTest extends
   AnyWordSpecLike
   with Matchers
   with BeforeAndAfterAll with LazyLogging {
-
   val system = ActorSystemFactory.system
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
   "Save to database actor" must {
