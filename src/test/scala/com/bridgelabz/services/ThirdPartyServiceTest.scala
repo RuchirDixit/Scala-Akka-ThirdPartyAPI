@@ -15,33 +15,28 @@
 // limitations under the License.
 package com.bridgelabz.services
 
+import com.bridgelabz.main.HttpClientSingleRequest
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.{JsObject, JsResultException, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 
 class ThirdPartyServiceTest extends AnyWordSpec with should.Matchers with MockitoSugar {
   // Test case To check if user exists
   val httpClient = HttpClientBuilder.create().build()
-  val response = httpClient.execute(new
-      HttpGet("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=5min&outputsize=full&apikey=demo"))
+  val url = HttpClientSingleRequest.url
+  val response = httpClient.execute(new HttpGet(url))
   val entity = response.getEntity
   val stringToParse = EntityUtils.toString(entity,"UTF-8")
   val jsonParser = Json.parse(stringToParse)
-  // Save to Database
 
-  // Save to CSV
- // SaveService.saveToCSV(jsonParser.as[JsObject].fields(1))
-//  "Check if exists" should {
-//    "return Added" in {
-//      val serbice =mock[(String,JsValue)]
-//      when(serbice._2).thenReturn(JsValue)
-//      val status = SaveService.saveToDatabase(jsonParser.as[JsObject].fields(1))
-//      assert(status == "Added")
-//    }
-//  }
+  "Check if exists" should {
+    "return Added" in {
+      val res = SaveService.saveToDatabase(jsonParser.as[JsObject].fields(1))
+      assert(res == "Added")
+    }
+  }
 }
