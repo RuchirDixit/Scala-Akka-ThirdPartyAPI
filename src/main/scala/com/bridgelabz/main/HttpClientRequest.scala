@@ -27,12 +27,14 @@ import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 
 object HttpClientSingleRequest extends LazyLogging{
+  val nameOfActor = "MongoClient_AkkahttpApp"
   def main(args: Array[String]): Unit = {
     val system = ActorSystemFactory.system
     implicit val executor: ExecutionContext = system.dispatcher
     val httpClient = HttpClientBuilder.create().build()
+    val url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=5min&outputsize=full&apikey=demo"
     val response = httpClient.execute(new
-        HttpGet("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=5min&outputsize=full&apikey=demo"))
+        HttpGet(url))
     // Actor to download data from third party API
     val actorToDownloadData = system.actorOf(Props[DownloadActor],"downloadingThirdPartyData")
     logger.info("Downloading data!")
