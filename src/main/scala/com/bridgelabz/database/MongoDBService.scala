@@ -24,10 +24,10 @@ object MongoDBService {
   val system = ActorSystemFactory.system
   implicit val executor: ExecutionContext = system.dispatcher
   val mongoClient: MongoClient = MongoClient()
-  val databaseName = sys.env("database_name")
+  val databaseName = sys.env("DATABASENAME")
   // Getting mongodb database
   val database: MongoDatabase = mongoClient.getDatabase(databaseName)
-  val collectionName = sys.env("collection_name")
+  val collectionName = "timeseriesdata"
   // Getting mongodb collection
   val collection: MongoCollection[Document] = database.getCollection(collectionName)
   collection.drop()
