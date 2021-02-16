@@ -25,7 +25,6 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
-
 object HttpClientSingleRequest extends LazyLogging{
   val nameOfActor = "MongoClient_AkkahttpApp"
   val symbol = sys.env("APISYMBOL")
@@ -48,8 +47,9 @@ object HttpClientSingleRequest extends LazyLogging{
     val stringToParse = EntityUtils.toString(entity,"UTF-8")
     val jsonParser = Json.parse(stringToParse)
     // Save to Database
-    SaveService.saveToDatabase(jsonParser.as[JsObject].fields(1))
+    val service = new SaveService
+    service.saveToDatabase(jsonParser.as[JsObject].fields(1))
     // Save to CSV
-    SaveService.saveToCSV(jsonParser.as[JsObject].fields(1))
+    service.saveToCSV(jsonParser.as[JsObject].fields(1))
   }
 }
