@@ -15,7 +15,9 @@
 // limitations under the License.
 package com.bridgelabz.services
 
+import com.bridgelabz.actorsystemfactory.ActorSystemFactory
 import com.bridgelabz.main.HttpClientSingleRequest
+import com.bridgelabz.main.HttpClientSingleRequest.url
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
@@ -23,20 +25,33 @@ import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsObject, Json}
+import org.mockito.Mockito.when
+import scala.concurrent.ExecutionContext
 
 class ThirdPartyServiceTest extends AnyWordSpec with should.Matchers with MockitoSugar {
   // Test case To check if user exists
+  val system = ActorSystemFactory.system
+  implicit val executor: ExecutionContext = system.dispatcher
   val httpClient = HttpClientBuilder.create().build()
-  val url = HttpClientSingleRequest.url
   val response = httpClient.execute(new HttpGet(url))
   val entity = response.getEntity
   val stringToParse = EntityUtils.toString(entity,"UTF-8")
   val jsonParser = Json.parse(stringToParse)
-
   "Check if exists" should {
     "return Added" in {
-      val res = SaveService.saveToDatabase(jsonParser.as[JsObject].fields(1))
+      val smock = mock[SaveService]
+      when(smock.saveToDatabase(jsonParser.as[JsObject].fields(1))).thenReturn("Added")
+      val res = smock.saveToDatabase(jsonParser.as[JsObject].fields(1))
       assert(res == "Added")
+    }
+  }
+
+  "Check if exists" should {
+    "return Save to csv" in {
+      val smock = mock[SaveService]
+      when(smock.saveToCSV(jsonParser.as[JsObject].fields(1))).thenReturn("Save to csv")
+      val res = smock.saveToCSV(jsonParser.as[JsObject].fields(1))
+      assert(res == "Save to csv")
     }
   }
 }
