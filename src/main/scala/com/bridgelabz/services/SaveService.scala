@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
 
-object SaveService extends LazyLogging {
+class SaveService extends LazyLogging {
   val system = ActorSystemFactory.system
   implicit val executor: ExecutionContext = system.dispatcher
   /**
