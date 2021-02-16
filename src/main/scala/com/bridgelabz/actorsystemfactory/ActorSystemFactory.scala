@@ -16,7 +16,8 @@
 package com.bridgelabz.actorsystemfactory
 
 import akka.actor.ActorSystem
+import com.bridgelabz.main.HttpClientSingleRequest
 
 object ActorSystemFactory {
-  implicit val system = ActorSystem("MongoClient_AkkahttpApp")
+  implicit val system = ActorSystem(HttpClientSingleRequest.nameOfActor)
 }
