@@ -19,5 +19,5 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.8.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "org.scalatestplus" %% "mockito-3-4" % "3.2.3.0" % "test",
-  "org.scalatest" %% "scalatest" % "3.2.2" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.2" % Test
 )
