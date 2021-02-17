@@ -39,7 +39,7 @@ class ThirdPartyServiceTest extends AnyWordSpec with should.Matchers with Mockit
   val jsonParser = Json.parse(stringToParse)
   "Check if exists" should {
     "return Added" in {
-      val smock = mock[SaveService]
+      val smock = mock[SaveDataService]
       when(smock.saveToDatabase(jsonParser.as[JsObject].fields(1))).thenReturn("Added")
       val res = smock.saveToDatabase(jsonParser.as[JsObject].fields(1))
       assert(res == "Added")
@@ -48,7 +48,7 @@ class ThirdPartyServiceTest extends AnyWordSpec with should.Matchers with Mockit
 
   "Check if exists" should {
     "return Save to csv" in {
-      val smock = mock[SaveService]
+      val smock = mock[SaveDataService]
       when(smock.saveToCSV(jsonParser.as[JsObject].fields(1))).thenReturn("Save to csv")
       val res = smock.saveToCSV(jsonParser.as[JsObject].fields(1))
       assert(res == "Save to csv")
