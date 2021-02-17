@@ -21,7 +21,10 @@ import com.typesafe.scalalogging.LazyLogging
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import scala.concurrent.ExecutionContextExecutor
+import akka.pattern.ask
+import akka.util.Timeout
+import concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class ThirdPartyActorsTest extends
   AnyWordSpecLike
@@ -32,7 +35,10 @@ class ThirdPartyActorsTest extends
   "Save to database actor" must {
     "expect response" in {
       val saveToDatabaseActor = system.actorOf(Props[DownloadActor], "greetingActor")
-      val response = saveToDatabaseActor ! "Hey"
+      implicit val timeout = Timeout(2.seconds);
+      val futureResponse = saveToDatabaseActor ? "Hey"
+      val response = Await.result(futureResponse,2.seconds)
+      assert(response == true)
     }
   }
 }
