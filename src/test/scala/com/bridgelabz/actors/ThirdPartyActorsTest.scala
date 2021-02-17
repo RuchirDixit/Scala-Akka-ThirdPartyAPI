@@ -16,14 +16,15 @@
 package com.bridgelabz.actors
 
 import akka.actor.Props
+import akka.pattern.ask
+import akka.util.Timeout
 import com.bridgelabz.actorsystemfactory.ActorSystemFactory
 import com.typesafe.scalalogging.LazyLogging
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import akka.pattern.ask
-import akka.util.Timeout
-import concurrent.duration._
+
+import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class ThirdPartyActorsTest extends
