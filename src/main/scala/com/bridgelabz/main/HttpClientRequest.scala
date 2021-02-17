@@ -18,7 +18,7 @@ package com.bridgelabz.main
 import akka.actor.Props
 import com.bridgelabz.actors.DownloadActor
 import com.bridgelabz.actorsystemfactory.ActorSystemFactory
-import com.bridgelabz.services.SaveService
+import com.bridgelabz.services.SaveDataService
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 object HttpClientSingleRequest extends LazyLogging{
+
   val nameOfActor = "MongoClient_AkkahttpApp"
   val symbol = sys.env("APISYMBOL")
   val interval = sys.env("APIINTERVAL")
@@ -34,6 +35,7 @@ object HttpClientSingleRequest extends LazyLogging{
   val outputsize = sys.env("OUTPUTSIZE")
   val thirdPartyApiHost = sys.env("THIRDPARTYHOST")
   val url = s"$thirdPartyApiHost/query?function=$function&symbol=$symbol&interval=$interval&outputsize=$outputsize&apikey=$key"
+
   def main(args: Array[String]): Unit = {
     val system = ActorSystemFactory.system
     implicit val executor: ExecutionContext = system.dispatcher
@@ -47,7 +49,7 @@ object HttpClientSingleRequest extends LazyLogging{
     val stringToParse = EntityUtils.toString(entity,"UTF-8")
     val jsonParser = Json.parse(stringToParse)
     // Save to Database
-    val service = new SaveService
+    val service = new SaveDataService
     service.saveToDatabase(jsonParser.as[JsObject].fields(1))
     // Save to CSV
     service.saveToCSV(jsonParser.as[JsObject].fields(1))
