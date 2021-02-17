@@ -35,7 +35,7 @@ object HttpClientSingleRequest extends LazyLogging{
   val outputsize = sys.env("OUTPUTSIZE")
   val thirdPartyApiHost = sys.env("THIRDPARTYHOST")
   val url = s"$thirdPartyApiHost/query?function=$function&symbol=$symbol&interval=$interval&outputsize=$outputsize&apikey=$key"
-
+  // $COVERAGE-OFF$
   def main(args: Array[String]): Unit = {
     val system = ActorSystemFactory.system
     implicit val executor: ExecutionContext = system.dispatcher
