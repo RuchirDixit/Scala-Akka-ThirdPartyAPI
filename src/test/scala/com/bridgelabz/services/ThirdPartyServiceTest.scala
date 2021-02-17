@@ -16,42 +16,48 @@
 package com.bridgelabz.services
 
 import com.bridgelabz.actorsystemfactory.ActorSystemFactory
-import com.bridgelabz.main.HttpClientSingleRequest
 import com.bridgelabz.main.HttpClientSingleRequest.url
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsObject, Json}
-import org.mockito.Mockito.when
+
 import scala.concurrent.ExecutionContext
 
 class ThirdPartyServiceTest extends AnyWordSpec with should.Matchers with MockitoSugar {
   // Test case To check if user exists
   val system = ActorSystemFactory.system
   implicit val executor: ExecutionContext = system.dispatcher
+  val service = new SaveDataService
   val httpClient = HttpClientBuilder.create().build()
   val response = httpClient.execute(new HttpGet(url))
   val entity = response.getEntity
   val stringToParse = EntityUtils.toString(entity,"UTF-8")
   val jsonParser = Json.parse(stringToParse)
-  "Check if exists" should {
+  "When passed data" should {
     "return Added" in {
-      val smock = mock[SaveDataService]
-      when(smock.saveToDatabase(jsonParser.as[JsObject].fields(1))).thenReturn("Added")
-      val res = smock.saveToDatabase(jsonParser.as[JsObject].fields(1))
-      assert(res == "Added")
+      val response = service.saveToDatabase(jsonParser.as[JsObject].fields(1))
+      assert(response=="Added")
     }
   }
 
-  "Check if exists" should {
-    "return Save to csv" in {
-      val smock = mock[SaveDataService]
-      when(smock.saveToCSV(jsonParser.as[JsObject].fields(1))).thenReturn("Save to csv")
-      val res = smock.saveToCSV(jsonParser.as[JsObject].fields(1))
-      assert(res == "Save to csv")
+  "When passed data" should {
+    "return Saved to csv" in {
+      val response = service.saveToCSV(jsonParser.as[JsObject].fields(1))
+      assert(response=="Saved to csv")
+    }
+  }
+
+  "When passed data" should {
+    "return Added using mocking" in {
+      val serviceMock = mock[SaveDataService]
+      when(serviceMock.saveToCSV(jsonParser.as[JsObject].fields(1))).thenReturn("Added")
+      val response = serviceMock.saveToCSV(jsonParser.as[JsObject].fields(1))
+      assert(response=="Added")
     }
   }
 }
