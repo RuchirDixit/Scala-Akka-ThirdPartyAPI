@@ -3,6 +3,9 @@ name := "AkkaHtp-3rdparty"
 version := "0.1"
 
 scalaVersion := "2.13.1"
+
+coverageEnabled := true
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.6.8",
   "com.typesafe.akka" %% "akka-http" % "10.2.1",
